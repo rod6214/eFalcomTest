@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eFalcomTest", "eFalcomTest\eFalcomTest.csproj", "{1B9A2F4A-57E9-4712-B46B-D694FA3A6CE9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CentroDistribucionApi", "CentroDistribucionController\CentroDistribucionApi.csproj", "{7C017E90-D503-47D5-B3A7-70C83EEDF4F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CentroDistribucionApi", "CentroDistribucionApi\CentroDistribucionApi.csproj", "{7C017E90-D503-47D5-B3A7-70C83EEDF4F7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{6DEDB4B1-4D39-4571-AEA2-8F9F163513E2}"
 EndProject

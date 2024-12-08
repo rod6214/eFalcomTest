@@ -17,6 +17,7 @@ namespace CentroDistribucion.Database.Contexts
         public virtual DbSet<Ubicacion> Ubicaciones { get; set; }
         public virtual DbSet<Movimiento> Movimientos { get; set; }
 
+
         public CentroDistribucionContext(DbContextOptions<CentroDistribucionContext> optionsBuilder, IOptions<CentroDistribucionOption> configOption) 
             : base (optionsBuilder)
         {

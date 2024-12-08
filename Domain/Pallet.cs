@@ -1,5 +1,8 @@
-﻿namespace Domain
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Domain
 {
+    [Index(nameof(CodigoProducto))]
     public class Pallet
     {
         public long Id { get; set; }

@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Domain.Services;
+using CentroDistribucion.Database.Implementations;
+using MediatR;
 
 namespace CentroDistribucion.Database
 {
@@ -14,8 +18,14 @@ namespace CentroDistribucion.Database
     {
         public static void AddDatabaseServices(this IServiceCollection services, IConfiguration configuration) 
         {
-            services.Configure<CentroDistribucionOption>(c => configuration.GetSection("ConnectionStrings"));
+            services.AddOptions<CentroDistribucionOption>().Bind(configuration.GetSection("ConnectionStrings"));
             services.AddDbContext<CentroDistribucionContext>();
+            services.AddTransient<ICentroDistribucionService, CentroDistribucionRepository>();
+            services.AddMediatR(options =>
+            {
+                options.RegisterServicesFromAssembly(typeof(ServiceRegistration).Assembly);
+            });
+
         }
     }
 }
