@@ -1,0 +1,6 @@
+@CentroDistribucionController_HostAddress = http://localhost:5073
+
+GET {{CentroDistribucionController_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
