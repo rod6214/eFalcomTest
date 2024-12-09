@@ -38,7 +38,8 @@ namespace CentroDistribucion.Database.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CodigoProducto = table.Column<long>(type: "bigint", nullable: false),
-                    UbicacionId = table.Column<long>(type: "bigint", nullable: false)
+                    UbicacionId = table.Column<long>(type: "bigint", nullable: false),
+                    Removed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {

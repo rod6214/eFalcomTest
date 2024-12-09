@@ -54,17 +54,19 @@ namespace CentroDistribucion.Database.Implementations
             }
         }
 
-        public async Task DeletePalletAsync(long codigoProducto)
+        public async Task DeletePalletAsync(long id)
         {
             try
             {
                 var pallet = await (from pa in context.Pallets
-                             where pa.CodigoProducto == codigoProducto
+                             where pa.Id == id
                              select pa).FirstOrDefaultAsync();
 
                 if (pallet is not null)
                 {
-                    context.Pallets.Remove(pallet);
+                    pallet.Removed = true;
+                    context.Update(pallet);
+                    //context.Pallets.Remove(pallet);
                     await context.SaveChangesAsync();
                 }
                 else
@@ -143,7 +145,7 @@ namespace CentroDistribucion.Database.Implementations
                 var firtsPallet = await (from pallet in context.Pallets
                                   join ubicacion in context.Ubicaciones
                                   on pallet.UbicacionId equals ubicacion.Id
-                                  where pallet.CodigoProducto == codigoProducto
+                                  where pallet.CodigoProducto == codigoProducto && !pallet.Removed
                                   orderby pallet.Id ascending
                                   select pallet).ToListAsync();
                 return firtsPallet.FirstOrDefault();
@@ -174,7 +176,8 @@ namespace CentroDistribucion.Database.Implementations
                 var pallets = await (from p in context.Pallets
                                      join m in context.Movimientos
                                      on p.Id equals m.PalletId
-                                     where (!codigoProducto.HasValue || p.CodigoProducto == codigoProducto)
+                                     where !p.Removed  
+                                     && (!codigoProducto.HasValue || p.CodigoProducto == codigoProducto)
                                      && (!fechaDesde.HasValue || m.Fecha >= fechaDesde && (m.Type == (int)TipoMovimiento.INGRESO))
                                      && (!fechaHasta.HasValue || m.Fecha >= fechaHasta && (m.Type == (int)TipoMovimiento.INGRESO))
                                      select p).ToListAsync();

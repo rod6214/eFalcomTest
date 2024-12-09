@@ -15,6 +15,7 @@ namespace CentroDistribucion.Database.EntityConfigurations
         {
             builder.ToTable("Pallets", "dbo");
             builder.Property(p => p.CodigoProducto).IsRequired();
+            builder.Property(p => p.Removed).HasDefaultValue(false);
             builder.HasMany(p => p.Movimientos)
                 .WithOne(m => m.Pallet)
                 .HasForeignKey(p => p.PalletId);

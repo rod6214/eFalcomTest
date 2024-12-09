@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CentroDistribucion.Database.Migrations
 {
     [DbContext(typeof(CentroDistribucionContext))]
-    [Migration("20241208224115_Initial_Migration")]
+    [Migration("20241209111616_Initial_Migration")]
     partial class Initial_Migration
     {
         /// <inheritdoc />
@@ -62,6 +62,11 @@ namespace CentroDistribucion.Database.Migrations
 
                     b.Property<long>("CodigoProducto")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("Removed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<long>("UbicacionId")
                         .HasColumnType("bigint");

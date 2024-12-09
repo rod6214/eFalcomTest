@@ -60,6 +60,11 @@ namespace CentroDistribucion.Database.Migrations
                     b.Property<long>("CodigoProducto")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("Removed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<long>("UbicacionId")
                         .HasColumnType("bigint");
 

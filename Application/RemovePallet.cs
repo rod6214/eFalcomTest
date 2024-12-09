@@ -38,13 +38,14 @@ namespace Application
                 
                 if (pallet is not null) 
                 {
+                    await centroDistribucion.DeletePalletAsync(pallet.Id);
+
                     await centroDistribucion.UpdateLocationAsync(new Ubicacion 
                     {
                         Id = pallet.UbicacionId,
-                        Ocupado = pallet.Ubicacion?.Pallets?.Count - 1 > maxPalletsByLoc,
+                        Ocupado = pallet.Ubicacion?.Pallets?.Count - 1 >= maxPalletsByLoc,
                     });
 
-                    await centroDistribucion.DeletePalletAsync(request.CodigoProducto);
                     await centroDistribucion.CreateMovimientoAsync(new Movimiento 
                     {
                         PalletId = pallet.Id,
