@@ -28,6 +28,20 @@ namespace CentroDistribucionApi.Controllers
             }
         }
 
+        [HttpDelete("extract")]
+        public async Task<ActionResult> RemovePallet([FromQuery] long codigo)
+        {
+            try
+            {
+                await mediator.Send(new RemovePallet { CodigoProducto = codigo });
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpGet("pallet")]
         public async Task<ActionResult> GetPallets([FromQuery] long? codigo, DateTime? desde, DateTime? hasta) 
         {
