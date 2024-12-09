@@ -25,6 +25,7 @@ namespace CentroDistribucionApi.Controllers
             catch 
             {
                 return BadRequest();
+                //throw;
             }
         }
 

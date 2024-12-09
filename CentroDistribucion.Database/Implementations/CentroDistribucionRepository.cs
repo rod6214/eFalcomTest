@@ -18,13 +18,18 @@ namespace CentroDistribucion.Database.Implementations
             this.context = context;
         }
 
-        public async Task CreateMovimientoAsync(Movimiento movimiento)
+        public async Task<Movimiento> CreateMovimientoAsync(Movimiento movimiento)
         {
             try
             {
-                if (movimiento == null) return;
+                if (movimiento == null) throw new Exception("Invalid input");
                 await context.AddAsync(movimiento);
                 await context.SaveChangesAsync();
+
+                var insertedMovimiento = await (from m in context.Movimientos
+                                            where m.PalletId == movimiento.PalletId
+                                            select m).ToListAsync();
+                return insertedMovimiento.First();
             }
             catch
             {
@@ -64,6 +69,21 @@ namespace CentroDistribucion.Database.Implementations
                 }
                 else
                     throw new Exception("Product pallet is not available.");
+            }
+            catch 
+            {
+                throw;
+            }
+        }
+
+        public async Task<Pallet?> GetLastPallet()
+        {
+            try
+            {
+                var last = await (from p in context.Pallets
+                           orderby p.Id descending
+                           select p).FirstOrDefaultAsync();
+                return last;
             }
             catch 
             {
@@ -183,7 +203,7 @@ namespace CentroDistribucion.Database.Implementations
             }
         }
 
-        public async Task<Ubicacion> GetUbicacionByCodigoAsync(long codigo)
+        public async Task<Ubicacion?> GetUbicacionByCodigoAsync(long codigo)
         {
             var ub = from ubicacion in context.Ubicaciones
                      join pallet in context.Pallets
@@ -191,8 +211,8 @@ namespace CentroDistribucion.Database.Implementations
                      orderby ubicacion.Id ascending
                      where pallet.CodigoProducto == codigo && !ubicacion.Ocupado
                      select ubicacion;
-            var result = await ub.ToListAsync();
-            return result.First();
+            var result = await ub.FirstOrDefaultAsync();
+            return result;
         }
 
         public async Task<Ubicacion> GetUbicacionByFilaColumnAsync(int row, int column)
@@ -224,8 +244,9 @@ namespace CentroDistribucion.Database.Implementations
                 await context.SaveChangesAsync();
                 var insertedPallet = await (from p in context.Pallets
                                     where p.CodigoProducto == pallet.CodigoProducto
+                                    orderby p.Id
                                     select p).ToListAsync();
-                return insertedPallet.First();
+                return insertedPallet.Last();
             }
             catch 
             {

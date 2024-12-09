@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.Extensions.Options;
 
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 
 
 namespace Application
@@ -36,7 +37,7 @@ namespace Application
             {
                 // Intentamos crear una ubicacion valida, si ya existe intentara actualizar el campo que determina
                 // si la ubicacion sigue libre
-                var relativePos = tryToCreateUbicacion(request);
+                var relativePos = await tryToCreateUbicacion(request);
 
                 var pallet = mapper.Map<Pallet>(request);
 
@@ -61,13 +62,13 @@ namespace Application
         {
             //vamos a tratar de crear una ubicacion si no existe ubicacion para cierto codigo de producto
             // tambien debemos crear una ubicacion si ya existe, pero esta ocupado
-            Ubicacion ubicacion = new Ubicacion();
+            Ubicacion? ubicacion = new Ubicacion();
 
             ubicacion = await centroDistribucion.GetUbicacionByCodigoAsync(request.CodigoProducto);
 
+            var tuple = await getNextPosition();
             if (ubicacion is null)
             {
-                var tuple = await getNextPosition();
                 ubicacion = new Ubicacion
                 {
                     Fila = tuple.Item1,
@@ -76,13 +77,24 @@ namespace Application
                 ubicacion = await centroDistribucion.IsertLocationAsync(ubicacion);
                 return ubicacion;
             }
-            else 
+            else
             {
-                await centroDistribucion.UpdateLocationAsync(new Ubicacion
+                if (ubicacion.Pallets?.Count == maxPalletsByLoc)
                 {
-                    Id = ubicacion.Id,
-                    Ocupado = ubicacion.Pallets?.Count + 1 > maxPalletsByLoc
-                });
+                    // Se cierra el apilado actual
+                    await centroDistribucion.UpdateLocationAsync(new Ubicacion
+                    {
+                        Id = ubicacion.Id,
+                        Ocupado = true
+                    });
+
+                    // Se crea nueva ubicacion para agrupar pallets
+                    ubicacion = await centroDistribucion.IsertLocationAsync(new Ubicacion
+                    {
+                        Fila = tuple.Item1,
+                        Columna = tuple.Item2,
+                    });
+                }
             }
 
             if (ubicacion is null) throw new Exception("Invalid operation");
@@ -95,11 +107,11 @@ namespace Application
             // Empezamos incrementando las columnas cuando se desborde, se aumenta la fila
             var ubicaciones = await centroDistribucion.GetUbicacionesAsync();
             // Si no hay ubicaciones, no hay ubicaciones registradas
-            var lastLocation = ubicaciones.LastOrDefault();
+            var lastLocation = ubicaciones.OrderBy(x => x.Id).LastOrDefault();
             
             if (lastLocation != null) 
             {
-                var newColumn = lastLocation.Columna++;
+                var newColumn = lastLocation.Columna+1;
                 var newRow = lastLocation.Fila;
                 if (newColumn > maxPalletsByLoc) 
                 {

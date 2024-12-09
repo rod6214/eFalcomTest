@@ -1,6 +1,7 @@
 ﻿using Application.Options;
 using AutoMapper;
 using Domain.Dtos;
+using Domain.Enums;
 using Domain.Services;
 using MediatR;
 using Microsoft.Extensions.Options;
@@ -40,10 +41,24 @@ namespace Application
                 var pallets = await centroDistribucion.GetPalletsAsync(request.CodigoProducto, 
                     request.FechaDesde, request.FechaHasta);
 
-                if (pallets != null) 
+                var movimientos = await centroDistribucion.GetMovimientosAsync();
+                var ubicaciones = await centroDistribucion.GetUbicacionesAsync();
+
+                if (pallets != null && movimientos != null && ubicaciones != null) 
                 {
-                    var result = mapper.Map<List<PalletDto>>(pallets);
-                    return result;
+                    var result = from p in pallets
+                            join m in movimientos
+                            on p.Id equals m.PalletId
+                            
+                            where m.Type == (int)TipoMovimiento.INGRESO
+                            select new PalletDto 
+                            {
+                                Id = p.Id,
+                                CodigoProducto = p.CodigoProducto,
+                                Ingreso = m.Fecha,
+                                Ubicacion = new UbicacionDto { Columna = p?.Ubicacion?.Columna ?? -1, Fila = p?.Ubicacion?.Fila ?? -1 }
+                            };
+                    return result.ToList();
                 }
 
                 return new List<PalletDto>();

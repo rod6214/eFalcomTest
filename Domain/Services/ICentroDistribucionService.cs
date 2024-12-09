@@ -20,10 +20,11 @@ namespace Domain.Services
         Task DeleteLocationAsync(long id);
         Task<Movimiento> GetMovimientoAsync(long id);
         Task<List<Movimiento>> GetMovimientosAsync();
-        Task CreateMovimientoAsync(Movimiento movimiento);
+        Task<Movimiento> CreateMovimientoAsync(Movimiento movimiento);
         Task<Ubicacion> GetUbicacionAsync(long id);
         Task<List<Ubicacion>> GetUbicacionesAsync();
-        Task<Ubicacion> GetUbicacionByCodigoAsync(long codigo);
+        Task<Ubicacion?> GetUbicacionByCodigoAsync(long codigo);
         Task<Ubicacion> GetUbicacionByFilaColumnAsync(int row, int column);
+        Task<Pallet?> GetLastPallet();
     }
 }
