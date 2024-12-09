@@ -13,6 +13,7 @@ namespace Application
         public GeneralProfile() 
         {
             CreateMap<InsertPallet, Pallet>();
+            CreateMap<RemovePallet, Pallet>();
         }
     }
 }

@@ -1,16 +1,13 @@
 ﻿using Application.Options;
 using AutoMapper;
 using Domain;
-using Domain.Dtos;
+using Domain.Enums;
 using Domain.Services;
 using MediatR;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
+
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Application
 {
@@ -37,14 +34,21 @@ namespace Application
         {
             try
             {
-                // Intentamos crear una ubicacion valida
+                // Intentamos crear una ubicacion valida, si ya existe intentara actualizar el campo que determina
+                // si la ubicacion sigue libre
                 var relativePos = tryToCreateUbicacion(request);
 
                 var pallet = mapper.Map<Pallet>(request);
 
                 pallet.UbicacionId = relativePos.Id;
 
-                await centroDistribucion.InsertPalletAsync(pallet);
+                pallet = await centroDistribucion.InsertPalletAsync(pallet);
+                await centroDistribucion.CreateMovimientoAsync(new Movimiento
+                {
+                    PalletId = pallet.Id,
+                    Fecha = DateTime.Now,
+                    Type = (int)TipoMovimiento.INGRESO
+                });
                 return true;
             }
             catch (Exception ex) 
@@ -61,36 +65,25 @@ namespace Application
 
             ubicacion = await centroDistribucion.GetUbicacionByCodigoAsync(request.CodigoProducto);
 
-
-            if (ubicacion is null || ubicacion.Ocupado)
+            if (ubicacion is null)
             {
                 var tuple = await getNextPosition();
                 ubicacion = new Ubicacion
                 {
                     Fila = tuple.Item1,
                     Columna = tuple.Item2,
-                    Ocupado = false
                 };
-                await centroDistribucion.IsertLocationAsync(ubicacion);
-                ubicacion = await centroDistribucion.GetUbicacionByFilaColumnAsync(ubicacion.Fila, ubicacion.Columna);
+                ubicacion = await centroDistribucion.IsertLocationAsync(ubicacion);
                 return ubicacion;
             }
-
-            if (ubicacion is not null && ubicacion.Pallets != null)
+            else 
             {
-                // Actualiza la ubicacion y calcula si ya esta ocupado
-                await centroDistribucion.UpdateLocationAsync(new Ubicacion 
+                await centroDistribucion.UpdateLocationAsync(new Ubicacion
                 {
                     Id = ubicacion.Id,
-                    Columna = ubicacion.Columna,
-                    Fila = ubicacion.Fila,
-                    Ocupado = ubicacion.Pallets.Count > maxPalletsByLoc
+                    Ocupado = ubicacion.Pallets?.Count + 1 > maxPalletsByLoc
                 });
-                ubicacion = await centroDistribucion.GetUbicacionByFilaColumnAsync(ubicacion.Fila, ubicacion.Columna);
-                return ubicacion;
             }
-
-
 
             if (ubicacion is null) throw new Exception("Invalid operation");
 
