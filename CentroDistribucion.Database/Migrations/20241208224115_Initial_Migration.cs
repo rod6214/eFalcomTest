@@ -15,20 +15,6 @@ namespace CentroDistribucion.Database.Migrations
                 name: "dbo");
 
             migrationBuilder.CreateTable(
-                name: "Pallets",
-                schema: "dbo",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CodigoProducto = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pallets", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Ubicaciones",
                 schema: "dbo",
                 columns: table => new
@@ -37,17 +23,31 @@ namespace CentroDistribucion.Database.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fila = table.Column<int>(type: "int", nullable: false),
                     Columna = table.Column<int>(type: "int", nullable: false),
-                    Ocupado = table.Column<bool>(type: "bit", nullable: false),
-                    PalletId = table.Column<long>(type: "bigint", nullable: false)
+                    Ocupado = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ubicaciones", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pallets",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CodigoProducto = table.Column<long>(type: "bigint", nullable: false),
+                    UbicacionId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pallets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Ubicaciones_Pallets_PalletId",
-                        column: x => x.PalletId,
+                        name: "FK_Pallets_Ubicaciones_UbicacionId",
+                        column: x => x.UbicacionId,
                         principalSchema: "dbo",
-                        principalTable: "Pallets",
+                        principalTable: "Ubicaciones",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -61,25 +61,25 @@ namespace CentroDistribucion.Database.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    UbicacionId = table.Column<long>(type: "bigint", nullable: false)
+                    PalletId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Movimientos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Movimientos_Ubicaciones_UbicacionId",
-                        column: x => x.UbicacionId,
+                        name: "FK_Movimientos_Pallets_PalletId",
+                        column: x => x.PalletId,
                         principalSchema: "dbo",
-                        principalTable: "Ubicaciones",
+                        principalTable: "Pallets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Movimientos_UbicacionId",
+                name: "IX_Movimientos_PalletId",
                 schema: "dbo",
                 table: "Movimientos",
-                column: "UbicacionId");
+                column: "PalletId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pallets_CodigoProducto",
@@ -88,10 +88,10 @@ namespace CentroDistribucion.Database.Migrations
                 column: "CodigoProducto");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ubicaciones_PalletId",
+                name: "IX_Pallets_UbicacionId",
                 schema: "dbo",
-                table: "Ubicaciones",
-                column: "PalletId");
+                table: "Pallets",
+                column: "UbicacionId");
         }
 
         /// <inheritdoc />
@@ -102,11 +102,11 @@ namespace CentroDistribucion.Database.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Ubicaciones",
+                name: "Pallets",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "Pallets",
+                name: "Ubicaciones",
                 schema: "dbo");
         }
     }

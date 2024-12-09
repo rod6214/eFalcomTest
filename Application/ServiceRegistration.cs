@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Application.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -13,6 +14,7 @@ namespace Application
                 options.RegisterServicesFromAssembly(typeof(ServiceRegistration).Assembly);
             });
             services.AddAutoMapper(typeof(ServiceRegistration).Assembly);
+            services.AddOptions<ApplicationOptions>().Bind(configuration.GetSection("ApplicationOptions"));
         }
     }
 }

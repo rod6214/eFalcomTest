@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CentroDistribucion.Database.Migrations
 {
     [DbContext(typeof(CentroDistribucionContext))]
-    [Migration("20241208182041_Initial_Migration")]
+    [Migration("20241208224115_Initial_Migration")]
     partial class Initial_Migration
     {
         /// <inheritdoc />
@@ -39,15 +39,15 @@ namespace CentroDistribucion.Database.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
+                    b.Property<long>("PalletId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<long>("UbicacionId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UbicacionId");
+                    b.HasIndex("PalletId");
 
                     b.ToTable("Movimientos", "dbo");
                 });
@@ -63,9 +63,14 @@ namespace CentroDistribucion.Database.Migrations
                     b.Property<long>("CodigoProducto")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("UbicacionId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CodigoProducto");
+
+                    b.HasIndex("UbicacionId");
 
                     b.ToTable("Pallets", "dbo");
                 });
@@ -87,31 +92,15 @@ namespace CentroDistribucion.Database.Migrations
                     b.Property<bool>("Ocupado")
                         .HasColumnType("bit");
 
-                    b.Property<long>("PalletId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PalletId");
 
                     b.ToTable("Ubicaciones", "dbo");
                 });
 
             modelBuilder.Entity("Domain.Movimiento", b =>
                 {
-                    b.HasOne("Domain.Ubicacion", "Ubicacion")
-                        .WithMany("Movimientos")
-                        .HasForeignKey("UbicacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ubicacion");
-                });
-
-            modelBuilder.Entity("Domain.Ubicacion", b =>
-                {
                     b.HasOne("Domain.Pallet", "Pallet")
-                        .WithMany("Ubicaciones")
+                        .WithMany("Movimientos")
                         .HasForeignKey("PalletId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -121,12 +110,23 @@ namespace CentroDistribucion.Database.Migrations
 
             modelBuilder.Entity("Domain.Pallet", b =>
                 {
-                    b.Navigation("Ubicaciones");
+                    b.HasOne("Domain.Ubicacion", "Ubicacion")
+                        .WithMany("Pallets")
+                        .HasForeignKey("UbicacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ubicacion");
+                });
+
+            modelBuilder.Entity("Domain.Pallet", b =>
+                {
+                    b.Navigation("Movimientos");
                 });
 
             modelBuilder.Entity("Domain.Ubicacion", b =>
                 {
-                    b.Navigation("Movimientos");
+                    b.Navigation("Pallets");
                 });
 #pragma warning restore 612, 618
         }

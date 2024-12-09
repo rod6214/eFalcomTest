@@ -11,7 +11,9 @@ namespace Domain
         public long Id { get; set; }
         public DateTime Fecha { get; set; }
         public int Type { get; set; }
-        public virtual long UbicacionId { get; set; }
-        public required virtual Ubicacion Ubicacion { get; set; }
+        public virtual long PalletId { get; set; }
+        public virtual Pallet? Pallet { get; set; }
+        //public virtual long UbicacionId { get; set; }
+        //public required virtual Ubicacion Ubicacion { get; set; }
     }
 }

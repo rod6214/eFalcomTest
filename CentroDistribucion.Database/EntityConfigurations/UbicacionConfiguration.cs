@@ -14,9 +14,7 @@ namespace CentroDistribucion.Database.EntityConfigurations
         public void Configure(EntityTypeBuilder<Ubicacion> builder)
         {
             builder.ToTable("Ubicaciones", "dbo");
-            builder.HasOne(u => u.Pallet)
-                .WithMany(p => p.Ubicaciones)
-                .HasForeignKey(u => u.PalletId);
+            builder.HasMany(u => u.Pallets);
         }
     }
 }

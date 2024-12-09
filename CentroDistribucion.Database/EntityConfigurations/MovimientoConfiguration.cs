@@ -14,9 +14,9 @@ namespace CentroDistribucion.Database.EntityConfigurations
         public void Configure(EntityTypeBuilder<Movimiento> builder)
         {
             builder.ToTable("Movimientos", "dbo");
-            builder.HasOne(m => m.Ubicacion)
-                .WithMany(u => u.Movimientos)
-                .HasForeignKey(m => m.UbicacionId);
+            builder.HasOne(m => m.Pallet)
+                .WithMany(p => p.Movimientos)
+                .HasForeignKey(m => m.PalletId);
         }
     }
 }

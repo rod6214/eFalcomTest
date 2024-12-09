@@ -7,6 +7,10 @@ namespace Domain
     {
         public long Id { get; set; }
         public long CodigoProducto { get; set; }
-        public virtual List<Ubicacion>? Ubicaciones { get; set; }
+        public long UbicacionId { get; set; }
+        public virtual Ubicacion? Ubicacion { get; set; }
+        public virtual List<Movimiento>? Movimientos { get; set; }
+        //public virtual List<Ubicacion>? Ubicaciones { get; set; }
+        //public required virtual Ubicacion Ubicacion { get; set; }
     }
 }
