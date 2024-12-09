@@ -5,10 +5,7 @@ using Domain.Enums;
 using Domain.Services;
 using MediatR;
 using Microsoft.Extensions.Options;
-
 using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
-
 
 namespace Application
 {
@@ -106,7 +103,6 @@ namespace Application
         {
             // Empezamos incrementando las columnas cuando se desborde, se aumenta la fila
             var ubicaciones = await centroDistribucion.GetUbicacionesAsync();
-            // Si no hay ubicaciones, no hay ubicaciones registradas
             var lastLocation = ubicaciones.OrderBy(x => x.Id).LastOrDefault();
             
             if (lastLocation != null) 
