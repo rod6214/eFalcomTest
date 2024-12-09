@@ -5,6 +5,7 @@ using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Linq;
+using Domain.Enums;
 
 namespace CentroDistribucion.Database.Implementations
 {
@@ -139,6 +140,26 @@ namespace CentroDistribucion.Database.Implementations
             {
                 var result = await context.Pallets.ToListAsync();
                 return result;
+            }
+            catch 
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Pallet>> GetPalletsAsync(long? codigoProducto, DateTime? fechaDesde, DateTime? fechaHasta)
+        {
+            try 
+            {
+                var pallets = await (from p in context.Pallets
+                                     join m in context.Movimientos
+                                     on p.Id equals m.PalletId
+                                     where (!codigoProducto.HasValue || p.CodigoProducto == codigoProducto)
+                                     && (!fechaDesde.HasValue || m.Fecha >= fechaDesde && (m.Type == (int)TipoMovimiento.INGRESO))
+                                     && (!fechaHasta.HasValue || m.Fecha >= fechaHasta && (m.Type == (int)TipoMovimiento.INGRESO))
+                                     select p).ToListAsync();
+                return pallets;
+
             }
             catch 
             {

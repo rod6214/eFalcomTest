@@ -12,6 +12,7 @@ namespace Domain.Services
         Task<Pallet> GetPalletAsync(long id);
         Task<Pallet?> GetPalletByCodigoAsync(long codigoProducto);
         Task<List<Pallet>> GetPalletsAsync();
+        Task<List<Pallet>> GetPalletsAsync(long? codigoProducto, DateTime? fechaDesde, DateTime? fechaHasta);
         Task<Pallet> InsertPalletAsync(Pallet pallet);
         Task DeletePalletAsync(long id);
         Task<Ubicacion> IsertLocationAsync(Ubicacion ubicacion);

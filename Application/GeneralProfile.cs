@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain;
+using Domain.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Application
         {
             CreateMap<InsertPallet, Pallet>();
             CreateMap<RemovePallet, Pallet>();
+            CreateMap<Ubicacion, UbicacionDto>();
+            CreateMap<Pallet, PalletDto>();
         }
     }
 }

@@ -16,10 +16,36 @@ namespace CentroDistribucionApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult> Pallet([FromBody] InsertPallet pallet)
+        public async Task<ActionResult> CreatePallet([FromBody] InsertPallet pallet)
         {
-            await mediator.Send(pallet);
-            return Ok();
+            try 
+            {
+                await mediator.Send(pallet);
+                return Ok();
+            }
+            catch 
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("pallet")]
+        public async Task<ActionResult> GetPallets([FromQuery] long? codigo, DateTime? desde, DateTime? hasta) 
+        {
+            try 
+            {
+                var pallets = await mediator.Send(new GetPallets 
+                {
+                    CodigoProducto = codigo,
+                    FechaDesde = desde,
+                    FechaHasta = hasta
+                });
+                return Ok(pallets);
+            }
+            catch 
+            {
+                return BadRequest();
+            }
         }
     }
 }
