@@ -179,7 +179,7 @@ namespace CentroDistribucion.Database.Implementations
                                      where !p.Removed  
                                      && (!codigoProducto.HasValue || p.CodigoProducto == codigoProducto)
                                      && (!fechaDesde.HasValue || m.Fecha >= fechaDesde && (m.Type == (int)TipoMovimiento.INGRESO))
-                                     && (!fechaHasta.HasValue || m.Fecha >= fechaHasta && (m.Type == (int)TipoMovimiento.INGRESO))
+                                     && (!fechaHasta.HasValue || m.Fecha <= fechaHasta && (m.Type == (int)TipoMovimiento.INGRESO))
                                      select p).ToListAsync();
                 return pallets;
 
