@@ -56,7 +56,7 @@ namespace Application
                                 Id = p.Id,
                                 CodigoProducto = p.CodigoProducto,
                                 Ingreso = m.Fecha,
-                                Ubicacion = new UbicacionDto { Columna = p?.Ubicacion?.Columna ?? -1, Fila = p?.Ubicacion?.Fila ?? -1 }
+                                Ubicacion = new UbicacionDto { Id = p?.Ubicacion?.Id ?? -1,  Columna = p?.Ubicacion?.Columna ?? -1, Fila = p?.Ubicacion?.Fila ?? -1 }
                             };
                     return result.ToList();
                 }

@@ -8,6 +8,7 @@ namespace Domain.Dtos
 {
     public class UbicacionDto
     {
+        public long Id { get; set; }
         public int Fila {  get; set; }
         public int Columna { get; set; }
     }

@@ -66,7 +66,6 @@ namespace CentroDistribucion.Database.Implementations
                 {
                     pallet.Removed = true;
                     context.Update(pallet);
-                    //context.Pallets.Remove(pallet);
                     await context.SaveChangesAsync();
                 }
                 else
@@ -180,6 +179,7 @@ namespace CentroDistribucion.Database.Implementations
                                      && (!codigoProducto.HasValue || p.CodigoProducto == codigoProducto)
                                      && (!fechaDesde.HasValue || m.Fecha >= fechaDesde && (m.Type == (int)TipoMovimiento.INGRESO))
                                      && (!fechaHasta.HasValue || m.Fecha <= fechaHasta && (m.Type == (int)TipoMovimiento.INGRESO))
+                                     orderby p.UbicacionId
                                      select p).ToListAsync();
                 return pallets;
 

@@ -1,0 +1,223 @@
+@page "/"
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject HttpClient HttpClient
+@using Domain;
+@using System.ComponentModel.DataAnnotations;
+
+@rendermode InteractiveServer
+
+<PageTitle>Pallets</PageTitle>
+
+
+<div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <button class="nav-link active bi bi-plus-square" @onclick="ShowIngresarModal">Agregar</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link active bi bi-dash-square" @onclick="ShowExtraerModal">Extraer</button>
+                    </li>
+                </ul>
+                <div class="d-flex justify-content-end">
+                    @* <form class="d-flex" role="search"> *@
+                    <EditForm Model="@searchUI" class="d-flex" role="search">
+                        <input @bind="searchUI.CodigoProducto" class="form-control me-2" type="search" placeholder="Codigo Producto" aria-label="Search">
+                        <button @onclick="SearchByCodigoProducto" class="btn btn-outline-success" type="submit">Search</button>
+                    </EditForm>
+                    @* </form> *@
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="row">
+        @foreach(var pallet in palletsJSON)
+        {
+            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2">
+                <div class="card card-yello-color mb-3" style="max-width: 18rem;">
+                    <div class="card-header">Paleta</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Id: @pallet.Id</h5>
+                        <p class="card-text">Codigo producto: @pallet.CodigoProducto</p>
+                        <p class="card-text">Fecha de ingreso: @pallet.Ingreso</p>
+                        <p class="card-text">Ubicaton: @pallet?.Ubicacion?.Id</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="palletIngresarModal" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalToggleLabel">Ingresar paleta</h1>
+                <button type="button" class="btn-close" @onclick="HideIngresarModal" aria-label="Close"></button>
+            </div>
+            <EditForm Model="@ingresarPalletUI">
+                <DataAnnotationsValidator />
+                <div class="modal-body">
+                    <label for="codigo" class="col-form-label">Codigo Producto</label>
+                    <input class="form-control" type="text" @bind="ingresarPalletUI.CodigoProducto" />
+                    <ValidationMessage For="@(() => ingresarPalletUI.CodigoProducto)" />
+                </div>
+                <div class="modal-footer">
+                    <button @onclick="Ingresar" type="submit" class="btn btn-primary">Ingresar</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="palletExtraerModal" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Extraer paleta</h1>
+                <button type="button" class="btn-close" @onclick="HideExtraerModal" aria-label="Close"></button>
+            </div>
+            <EditForm Model="@extraerPalletUI">
+                <DataAnnotationsValidator />
+                <div class="modal-body">
+                    <label for="codigo" class="col-form-label">Codigo Producto</label>
+                    <input class="form-control" type="text" @bind="extraerPalletUI.CodigoProducto" />
+                    <ValidationMessage For="@(() => extraerPalletUI.CodigoProducto)" />
+                </div>
+                <div class="modal-footer">
+                    <button @onclick="Extraer" type="submit" class="btn btn-primary">Extraer</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private PalletUI ingresarPalletUI = new();
+    private PalletUI extraerPalletUI = new();
+    private Searcher searchUI = new();
+    private List<Domain.Dtos.PalletDto> palletsJSON = new List<Domain.Dtos.PalletDto>();
+
+    public class PalletUI
+    {
+        [Required]
+        [Range(1, 9999)]
+        public long CodigoProducto { get; set; }
+    }
+
+    public class Searcher
+    {
+        public string? CodigoProducto { get; set; }
+    }
+
+    private IJSObjectReference? module;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            await loadData();
+            module = await JS.InvokeAsync<IJSObjectReference>("import",
+                "./Components/Pages/Pallets.razor.js");
+
+            StateHasChanged();
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+        {
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+    private async Task loadData()
+    {
+        var result = await HttpClient.GetFromJsonAsync<List<Domain.Dtos.PalletDto>>("https://localhost:7263/api/Pallet/pallet");
+        if (result is not null)
+            palletsJSON = result;
+    }
+
+    private async Task ShowIngresarModal()
+    {
+        ingresarPalletUI = new();
+        if (module is not null)
+            await module.InvokeVoidAsync("showIngresarModalJS");
+    }
+
+    private async Task HideIngresarModal()
+    {
+        if (module is not null)
+            await module.InvokeVoidAsync("hideIngresarModalJS");
+    }
+
+    private async Task ShowExtraerModal()
+    {
+        extraerPalletUI = new();
+        if (module is not null)
+            await module.InvokeVoidAsync("showExtraerModalJS");
+    }
+
+    private async Task HideExtraerModal()
+    {
+        if (module is not null)
+            await module.InvokeVoidAsync("hideExtraerModalJS");
+    }
+
+    private async Task Ingresar()
+    {
+        System.Diagnostics.Debug.WriteLine("Ingresar");
+        if (ingresarPalletUI.CodigoProducto <= 0) return;
+        await HideIngresarModal();
+        await HttpClient.PostAsJsonAsync("https://localhost:7263/api/Pallet/create", 
+        new Domain.Dtos.InsertPalletDto
+        {
+            CodigoProducto = ingresarPalletUI.CodigoProducto    
+        });
+        await loadData();
+    }
+
+    private async Task Extraer()
+    {
+        System.Diagnostics.Debug.WriteLine("Extraer");
+        if (extraerPalletUI.CodigoProducto <= 0) return;
+        await HideExtraerModal();
+        await HttpClient.PostAsJsonAsync($"https://localhost:7263/api/Pallet/extract?codigo={extraerPalletUI.CodigoProducto}", new {});
+        await loadData();
+    }
+
+    private async Task SearchByCodigoProducto()
+    {
+        var isnullempty = string.IsNullOrEmpty(searchUI.CodigoProducto);
+        if (!long.TryParse(searchUI.CodigoProducto, out long number) && !isnullempty) return;
+        string uri = "";
+
+        if (isnullempty)
+        {
+            uri = $"https://localhost:7263/api/Pallet/pallet";
+        }
+        else
+        {
+            uri = $"https://localhost:7263/api/Pallet/pallet?codigo={searchUI.CodigoProducto}";
+        }
+
+        var result = await HttpClient.GetFromJsonAsync<List<Domain.Dtos.PalletDto>>(uri);
+        if (result is not null)
+            palletsJSON = result;
+    }
+}

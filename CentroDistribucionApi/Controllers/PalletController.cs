@@ -29,7 +29,7 @@ namespace CentroDistribucionApi.Controllers
             }
         }
 
-        [HttpDelete("extract")]
+        [HttpPost("extract")]
         public async Task<ActionResult> RemovePallet([FromQuery] long codigo)
         {
             try
